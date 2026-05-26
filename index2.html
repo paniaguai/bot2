@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>👁️ PawBot — Your PawVibesZ AI Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon-pink: #ff2d78;
+    --neon-cyan: #00f5ff;
+    --neon-lime: #a8ff3e;
+    --neon-purple: #bf00ff;
+    --neon-orange: #ff6f00;
+    --neon-yellow: #ffe500;
+    --dark-bg: #050510;
+    --panel-bg: rgba(10, 10, 30, 0.85);
+    --glass: rgba(255,255,255,0.04);
+    --border-glow: rgba(0, 245, 255, 0.3);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--dark-bg);
+    color: #e0e8ff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── ANIMATED BACKGROUND ── */
+  .bg-layer {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(191,0,255,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 80%, rgba(0,245,255,0.15) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 70% at 50% 50%, rgba(255,45,120,0.07) 0%, transparent 70%),
+      #050510;
+  }
+
+  .grid-overlay {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridDrift 20s linear infinite;
+  }
+
+  @keyframes gridDrift {
+    from { transform: translateY(0); }
+    to   { transform: translateY(50px); }
+  }
+
+  .particles {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: floatUp linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes floatUp {
+    0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative; z-index: 10;
+    padding: 28px 40px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(0,245,255,0.12);
+    background: rgba(5,5,16,0.7);
+    backdrop-filter: blur(12px);
+  }
+
+  .logo-area {
+    display: flex; align-items: center; gap: 14px;
+  }
+
+  .logo-icon {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 0 24px rgba(255,45,120,0.6), 0 0 48px rgba(191,0,255,0.3);
+    animation: iconPulse 3s ease-in-out infinite;
+    cursor: pointer;
+  }
+
+  @keyframes iconPulse {
+    0%, 100% { box-shadow: 0 0 24px rgba(255,45,120,0.6), 0 0 48px rgba(191,0,255,0.3); }
+    50%       { box-shadow: 0 0 36px rgba(255,45,120,0.9), 0 0 72px rgba(191,0,255,0.5); }
+  }
+
+  .logo-text {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 28px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-lime));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: rgba(0,245,255,0.6);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-badge {
+    display: flex; gap: 10px; align-items: center;
+  }
+
+  .badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .badge-live {
+    background: rgba(168,255,62,0.15);
+    border: 1px solid var(--neon-lime);
+    color: var(--neon-lime);
+    animation: blinkBadge 2s ease-in-out infinite;
+  }
+
+  @keyframes blinkBadge {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+  }
+
+  .badge-cats {
+    background: rgba(0,245,255,0.1);
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .main {
+    position: relative; z-index: 5;
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 100px;
+    min-height: calc(100vh - 100px);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    margin-bottom: 44px;
+    animation: heroFadeIn 0.8s ease both;
+  }
+
+  @keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(32px, 6vw, 62px);
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-pink) 40%, var(--neon-yellow) 80%, var(--neon-lime) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 30px rgba(0,245,255,0.4));
+    margin-bottom: 16px;
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(200,220,255,0.7);
+    letter-spacing: 1px;
+    line-height: 1.6;
+    max-width: 520px;
+    margin: 0 auto 24px;
+  }
+
+  .hero-stats {
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .stat-pill {
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: 1px solid;
+    backdrop-filter: blur(8px);
+  }
+
+  .stat-pill:nth-child(1) { background: rgba(255,45,120,0.12); border-color: rgba(255,45,120,0.4); color: var(--neon-pink); }
+  .stat-pill:nth-child(2) { background: rgba(0,245,255,0.1);   border-color: rgba(0,245,255,0.4);   color: var(--neon-cyan); }
+  .stat-pill:nth-child(3) { background: rgba(168,255,62,0.1);  border-color: rgba(168,255,62,0.4);  color: var(--neon-lime); }
+  .stat-pill:nth-child(4) { background: rgba(255,229,0,0.1);   border-color: rgba(255,229,0,0.4);   color: var(--neon-yellow); }
+
+  /* ── CHAT CONTAINER ── */
+  .chat-wrapper {
+    width: 100%; max-width: 760px;
+    display: flex; flex-direction: column;
+    animation: slideUp 0.6s 0.3s ease both;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .chat-box {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-glow);
+    border-radius: 24px 24px 0 0;
+    backdrop-filter: blur(20px);
+    height: 460px;
+    overflow-y: auto;
+    padding: 28px 24px 16px;
+    display: flex; flex-direction: column; gap: 18px;
+    box-shadow: 0 0 60px rgba(0,245,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
+    scroll-behavior: smooth;
+  }
+
+  .chat-box::-webkit-scrollbar { width: 4px; }
+  .chat-box::-webkit-scrollbar-track { background: transparent; }
+  .chat-box::-webkit-scrollbar-thumb { background: rgba(0,245,255,0.3); border-radius: 2px; }
+
+  /* ── MESSAGES ── */
+  .msg {
+    display: flex; gap: 12px; align-items: flex-start;
+    animation: msgIn 0.35s ease both;
+  }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .msg.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 38px; height: 38px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+
+  .avatar-bot {
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+    box-shadow: 0 0 16px rgba(255,45,120,0.5);
+  }
+
+  .avatar-user {
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-lime));
+    box-shadow: 0 0 16px rgba(0,245,255,0.4);
+  }
+
+  .bubble {
+    padding: 13px 18px;
+    border-radius: 16px;
+    font-size: 14.5px;
+    line-height: 1.65;
+    max-width: 78%;
+    position: relative;
+  }
+
+  .bubble-bot {
+    background: linear-gradient(135deg, rgba(191,0,255,0.15), rgba(0,245,255,0.1));
+    border: 1px solid rgba(191,0,255,0.3);
+    color: #d8eaff;
+    border-radius: 4px 16px 16px 16px;
+  }
+
+  .bubble-user {
+    background: linear-gradient(135deg, rgba(0,245,255,0.18), rgba(168,255,62,0.12));
+    border: 1px solid rgba(0,245,255,0.35);
+    color: #e8f8ff;
+    border-radius: 16px 4px 16px 16px;
+    text-align: right;
+  }
+
+  .sender-label {
+    font-size: 10px;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    opacity: 0.55;
+  }
+
+  .bot-name { color: var(--neon-pink); }
+  .user-name { color: var(--neon-cyan); }
+
+  /* typing dots */
+  .typing-dots span {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--neon-cyan);
+    margin: 0 2px;
+    animation: dot 1.2s ease-in-out infinite;
+  }
+
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes dot {
+    0%,80%,100% { transform: scale(0.6); opacity: 0.4; }
+    40%          { transform: scale(1.1); opacity: 1; }
+  }
+
+  /* ── QUICK CHIPS ── */
+  .chips-bar {
+    background: rgba(10,10,30,0.6);
+    border-left: 1px solid var(--border-glow);
+    border-right: 1px solid var(--border-glow);
+    padding: 12px 20px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    backdrop-filter: blur(12px);
+  }
+
+  .chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid;
+    transition: all 0.2s ease;
+    letter-spacing: 0.3px;
+  }
+
+  .chip:nth-child(1)  { background:rgba(255,45,120,0.1); border-color:rgba(255,45,120,0.4); color:var(--neon-pink); }
+  .chip:nth-child(2)  { background:rgba(0,245,255,0.08); border-color:rgba(0,245,255,0.35); color:var(--neon-cyan); }
+  .chip:nth-child(3)  { background:rgba(168,255,62,0.08); border-color:rgba(168,255,62,0.35); color:var(--neon-lime); }
+  .chip:nth-child(4)  { background:rgba(255,229,0,0.08); border-color:rgba(255,229,0,0.35); color:var(--neon-yellow); }
+  .chip:nth-child(5)  { background:rgba(191,0,255,0.1); border-color:rgba(191,0,255,0.4); color:#e070ff; }
+  .chip:nth-child(6)  { background:rgba(255,111,0,0.1); border-color:rgba(255,111,0,0.4); color:var(--neon-orange); }
+
+  .chip:hover {
+    transform: translateY(-2px) scale(1.05);
+    filter: brightness(1.2);
+  }
+
+  /* ── INPUT BAR ── */
+  .input-bar {
+    display: flex; gap: 0;
+    background: rgba(8,8,28,0.9);
+    border: 1px solid var(--border-glow);
+    border-top: none;
+    border-radius: 0 0 24px 24px;
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+    padding: 14px;
+    gap: 10px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+
+  .input-field {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(0,245,255,0.2);
+    border-radius: 14px;
+    padding: 12px 18px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 14px;
+    color: #e8f4ff;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input-field::placeholder { color: rgba(160,200,240,0.35); }
+
+  .input-field:focus {
+    border-color: rgba(0,245,255,0.5);
+    box-shadow: 0 0 16px rgba(0,245,255,0.15);
+  }
+
+  .send-btn {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    border: none; cursor: pointer;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    color: white; font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 20px rgba(255,45,120,0.4);
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 32px rgba(255,45,120,0.7);
+  }
+
+  .send-btn:active { transform: scale(0.95); }
+
+  /* ── FOOTER CTA ── */
+  .footer-cta {
+    margin-top: 44px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    animation: slideUp 0.6s 0.6s ease both;
+  }
+
+  .cta-label {
+    font-size: 12px;
+    color: rgba(160,200,255,0.5);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Orbitron', monospace;
+  }
+
+  .official-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 36px;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-cyan));
+    background-size: 200% 100%;
+    border-radius: 50px;
+    color: white;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-transform: uppercase;
+    animation: gradientShift 3s linear infinite;
+    box-shadow: 0 0 30px rgba(255,45,120,0.5), 0 0 60px rgba(0,245,255,0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .official-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.1);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .official-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 50px rgba(255,45,120,0.7), 0 0 100px rgba(0,245,255,0.3);
+  }
+
+  .official-btn:hover::before { opacity: 1; }
+
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .footer-note {
+    font-size: 12px;
+    color: rgba(140,170,220,0.4);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .footer-note a {
+    color: rgba(0,245,255,0.6);
+    text-decoration: none;
+  }
+
+  .footer-note a:hover { color: var(--neon-cyan); }
+
+  /* ── SCANLINE EFFECT ── */
+  .scanlines {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+  }
+
+  /* ── CORNER DECORATIONS ── */
+  .corner {
+    position: fixed; width: 60px; height: 60px; z-index: 2; pointer-events: none;
+  }
+
+  .corner-tl { top: 90px; left: 16px; border-top: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan); opacity: 0.4; }
+  .corner-tr { top: 90px; right: 16px; border-top: 2px solid var(--neon-pink); border-right: 2px solid var(--neon-pink); opacity: 0.4; }
+  .corner-bl { bottom: 16px; left: 16px; border-bottom: 2px solid var(--neon-lime); border-left: 2px solid var(--neon-lime); opacity: 0.4; }
+  .corner-br { bottom: 16px; right: 16px; border-bottom: 2px solid var(--neon-purple); border-right: 2px solid var(--neon-purple); opacity: 0.4; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    header { padding: 16px 20px; }
+    .logo-text { font-size: 20px; }
+    .logo-icon { width: 42px; height: 42px; font-size: 20px; }
+    .hero-title { font-size: 32px; }
+    .chat-box { height: 360px; }
+    .main { padding: 28px 12px 80px; }
+    .chips-bar { padding: 10px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BG layers -->
+<div class="bg-layer"></div>
+<div class="grid-overlay"></div>
+<div class="particles" id="particles"></div>
+<div class="scanlines"></div>
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">
+    <div class="logo-icon">🐾</div>
+    <div>
+      <div class="logo-text">PawBot</div>
+      <div class="logo-sub">PawVibesZ AI Guide</div>
+    </div>
+  </div>
+  <div class="header-badge">
+    <div class="badge badge-live">● Online</div>
+    <div class="badge badge-cats">70+ Cats</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-title">Meet PawBot 😻</div>
+    <p class="hero-sub">Your futuristic guide to the world's first <strong>Cats on Zoom</strong> platform. Ask me anything about PawVibesZ!</p>
+    <div class="hero-stats">
+      <div class="stat-pill">🌍 20+ Countries</div>
+      <div class="stat-pill">🐾 70+ Real Cats</div>
+      <div class="stat-pill">✨ €8 / Session</div>
+      <div class="stat-pill">🧘 Mindful Presence</div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-wrapper">
+    <div class="chat-box" id="chatBox"></div>
+
+    <div class="chips-bar">
+      <div class="chip" onclick="sendChip(this)">💰 How much does it cost?</div>
+      <div class="chip" onclick="sendChip(this)">🐱 How do I book a session?</div>
+      <div class="chip" onclick="sendChip(this)">🔬 What does science say?</div>
+      <div class="chip" onclick="sendChip(this)">🌍 Which countries?</div>
+      <div class="chip" onclick="sendChip(this)">💙 What is PawVibesZ?</div>
+      <div class="chip" onclick="sendChip(this)">👥 Group sessions?</div>
+    </div>
+
+    <div class="input-bar">
+      <input
+        class="input-field"
+        id="userInput"
+        type="text"
+        placeholder="Ask PawBot anything about cats on Zoom… 🐾"
+        autocomplete="off"
+        onkeydown="if(event.key==='Enter') sendMessage()"
+      />
+      <button class="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <!-- FOOTER CTA -->
+  <div class="footer-cta">
+    <div class="cta-label">Ready to meet your cat?</div>
+    <a href="https://paniaguai.github.io/pawz/" target="_blank" class="official-btn">
+      😸 Visit Official PawVibesZ Site
+    </a>
+    <p class="footer-note">
+      The World's First Cats on Zoom Platform &nbsp;·&nbsp;
+      <a href="https://paniaguai.github.io/pawz/" target="_blank">paniaguai.github.io/pawz</a>
+    </p>
+  </div>
+
+</main>
+
+<script>
+// ── PARTICLES ──
+(function spawnParticles() {
+  const container = document.getElementById('particles');
+  const colors = ['#ff2d78','#00f5ff','#a8ff3e','#bf00ff','#ffe500','#ff6f00'];
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement('div');
+    p.classList.add('particle');
+    const size = Math.random() * 5 + 2;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${Math.random()*14+8}s;
+      animation-delay:${Math.random()*12}s;
+      box-shadow: 0 0 ${size*3}px currentColor;
+    `;
+    container.appendChild(p);
+  }
+})();
+
+// ── KNOWLEDGE BASE ──
+const KB = {
+  what: `**PawVibesZ** is the world's first Cats on Zoom platform! 😻\n\nYou get a real, live, purring cat on a private Zoom call — hosted by a specialist from anywhere across 20+ countries. No scripts. No algorithms. Just genuine feline presence.\n\nIt's designed as an antidote to our noisy, disconnected digital world. One session can lower your cortisol, release oxytocin, and reset your entire nervous system. 🧘`,
+  price: `Super affordable! Here's the pricing:\n\n💛 **Solo session — €8** · One-on-one with a real cat & their human host. Book via Stripe or PayPal.\n\n👥 **Group session — €80** · Bring your team, friends, or book club. Perfect for remote team wellness!\n\nAt €8, it's less than a coffee — and science says it has better ROI than most wellness subscriptions. 😸`,
+  book: `Booking is easy — 4 steps:\n\n1. 🐱 **Pick a cat** — Browse 70+ real cats across 20+ countries\n2. 💳 **Pay** — €8 via Stripe or PayPal (€80 for groups)\n3. 📅 **Schedule** — Fill in the booking form with your preferred date & time\n4. 😌 **Join on Zoom** — Let the purring do its magic!\n\nVisit the official site to browse all cats: [paniaguai.github.io/pawz](https://paniaguai.github.io/pawz/) 🐾`,
+  science: `The science is fascinating! 🔬\n\n• **Purring heals** — Cat purr frequencies (25–50 Hz) promote bone density, reduce swelling, and lower blood pressure\n• **Oxytocin release** — Even *watching* animals (not just touching!) triggers bonding hormones that fight stress\n• **Better sleep** — A calming cat session before bed reduces racing thoughts\n• **Focus returns** — Micro-breaks with positive emotional stimuli restore cognitive attention better than social media scrolling\n\n📊 Studies show **68% reduction** in self-reported stress after animal-assisted interactions. Average time to feel calmer: just **8 minutes**!`,
+  countries: `PawVibesZ has cats in **20+ countries** worldwide! 🌍\n\n🇪🇸 Spain · 🇵🇭 Philippines · 🇺🇸 United States · 🇩🇪 Germany · 🇬🇧 UK · 🇮🇩 Indonesia · 🇵🇹 Portugal · 🇨🇦 Canada · 🇯🇵 Japan · 🇰🇷 South Korea · 🇸🇬 Singapore · 🇳🇱 Netherlands · 🇨🇭 Switzerland · 🇬🇷 Greece · 🇮🇹 Italy · 🇮🇪 Ireland · 🇵🇱 Poland · 🇿🇦 South Africa · 🇸🇻 El Salvador · 🇨🇷 Costa Rica · 🇨🇾 Cyprus · 🇱🇹 Lithuania · 🇦🇿 Azerbaijan\n\nYour cat might be in Tokyo, Johannesburg, or Valencia. Each session is a tiny portal to another corner of the world! 🌐`,
+  group: `Yes! 👥 **Group sessions are available for €80** — perfect for:\n\n• Remote teams suffering from Zoom fatigue\n• Friend groups or book clubs\n• Corporate wellness initiatives\n• Anyone who wants to share the magic!\n\nCats cure Zoom fatigue better than any icebreaker. Book via Stripe or PayPal on the official site. 🐾`,
+  benefits: `Here's what PawVibesZ does for you:\n\n😴 **Better sleep** — calming pre-bed ritual\n💓 **Lower blood pressure** — proven by research\n😂 **More laughter** — cats are delightfully chaotic\n🧘 **Less anxiety** — oxytocin + purring = calm\n🧠 **Cortisol drops instantly** — within minutes!\n🌿 **Mindfulness without an app** — just watching a cat be a cat\n\n*"There's something about the cat just being utterly unbothered that recalibrates my entire nervous system." — Mia T., New York ⭐⭐⭐⭐⭐*`,
+  cats: `PawVibesZ has **70+ real, living, breathing, purring cats** across 20+ countries! 😸\n\nEach cat comes with a specialist human host who cares for them. Sessions are:\n✅ Real (not AI-generated!)\n✅ Unscripted — cats do whatever they want\n✅ Live on Zoom\n✅ Privately hosted\n\nSome highlights from real sessions: Cheto knocked over a water glass (highlight of someone's week 😄), Jeeves made Sarah M. from London feel like a human again after a brutal week.\n\nBrowse all cats at [paniaguai.github.io/pawz](https://paniaguai.github.io/pawz/) 🐾`,
+  paypal: `Yes! PawVibesZ accepts both **Stripe** and **PayPal** 💙\n\n• Stripe for solo (€8) and group (€80) sessions\n• PayPal at paypal.me/okgomeet\n\nAfter payment, fill in the scheduling form to pick your cat and preferred date/time. Confirmation is fast! 📅`,
+  hosts: `PawVibesZ has **50+ specialist hosts** around the world — real people who care for and live with the cats. 🏠\n\nThey join the Zoom call with their cat, creating a warm, personal connection. It's not just about the cat — it's about the human-feline team that makes each session unique and genuine.`,
+  default: `Great question! 😸 Here's what I know about **PawVibesZ**:\n\nIt's the world's first Cats on Zoom platform — you book a 1-on-1 (€8) or group (€80) session with a real cat and their host, live on Zoom, from 20+ countries.\n\nAsk me about: pricing, booking, the science behind cat therapy, which countries, group sessions, or browse the official site! 🌍\n\n[Visit paniaguai.github.io/pawz →](https://paniaguai.github.io/pawz/)`
+};
+
+function getResponse(text) {
+  const t = text.toLowerCase();
+  if (/what is|what'?s|about|explain|tell me|pawvibes/i.test(t) && !/science|study|research/i.test(t)) return KB.what;
+  if (/price|cost|how much|€|euro|cheap|afford|pay/i.test(t) && !/paypal/i.test(t)) return KB.price;
+  if (/book|schedule|how (do i|to)|process|step|start|join/i.test(t)) return KB.book;
+  if (/science|research|study|studies|proof|evidence|why|benefit|health|cortisol|oxytocin|purr/i.test(t)) return KB.science;
+  if (/countr|where|world|nation|spain|japan|us |uk |german|ireland|tokyo|africa|location/i.test(t)) return KB.countries;
+  if (/group|team|friend|club|corporate|company|multiple/i.test(t)) return KB.group;
+  if (/benefit|good for|help|sleep|blood pressure|anxiety|stress|laugh|calm|mindful/i.test(t)) return KB.benefits;
+  if (/how many cat|real cat|cat like|cat name|cat breed|see the cat|meet cat|browse/i.test(t)) return KB.cats;
+  if (/paypal/i.test(t)) return KB.paypal;
+  if (/host|specialist|human|person|who/i.test(t)) return KB.hosts;
+  return KB.default;
+}
+
+// ── CHAT ENGINE ──
+const chatBox = document.getElementById('chatBox');
+let isTyping = false;
+
+function renderMarkdown(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[(.+?)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" style="color:var(--neon-cyan);text-decoration:underline;text-underline-offset:3px">$1</a>')
+    .replace(/\n/g, '<br>');
+}
+
+function addMessage(text, isUser) {
+  const wrap = document.createElement('div');
+  wrap.className = `msg ${isUser ? 'user' : 'bot'}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = `avatar ${isUser ? 'avatar-user' : 'avatar-bot'}`;
+  avatar.textContent = isUser ? '🧑' : '🐾';
+
+  const bubble = document.createElement('div');
+  bubble.className = `bubble ${isUser ? 'bubble-user' : 'bubble-bot'}`;
+
+  const label = document.createElement('div');
+  label.className = `sender-label ${isUser ? 'user-name' : 'bot-name'}`;
+  label.textContent = isUser ? 'You' : 'PawBot';
+
+  const content = document.createElement('div');
+  content.innerHTML = renderMarkdown(text);
+
+  bubble.appendChild(label);
+  bubble.appendChild(content);
+  wrap.appendChild(avatar);
+  wrap.appendChild(bubble);
+  chatBox.appendChild(wrap);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function showTyping() {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg bot';
+  wrap.id = 'typingIndicator';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar avatar-bot';
+  avatar.textContent = '🐾';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble bubble-bot';
+  bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+
+  wrap.appendChild(avatar);
+  wrap.appendChild(bubble);
+  chatBox.appendChild(wrap);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+function sendMessage() {
+  if (isTyping) return;
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage(text, true);
+  input.value = '';
+  isTyping = true;
+
+  showTyping();
+  const delay = 800 + Math.random() * 700;
+  setTimeout(() => {
+    removeTyping();
+    addMessage(getResponse(text), false);
+    isTyping = false;
+  }, delay);
+}
+
+function sendChip(el) {
+  const input = document.getElementById('userInput');
+  input.value = el.textContent.replace(/^[^\w]+/, '').trim();
+  sendMessage();
+}
+
+// ── WELCOME MESSAGE ──
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    addMessage(`Meow! 😻 I'm **PawBot**, your guide to **PawVibesZ** — the world's first Cats on Zoom platform!\n\nI can tell you all about:\n🐾 What PawVibesZ is\n💰 Pricing & booking\n🔬 The science of cat therapy\n🌍 Our cats across 20+ countries\n\nTap a quick question below or type anything! What brings you here today? 🐱`, false);
+  }, 600);
+});
+</script>
+
+</body>
+</html>
