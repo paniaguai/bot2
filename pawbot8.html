@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐾 PawBot — PawVibesZ AI Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon-cyan: #00f5ff;
+    --neon-pink: #ff006e;
+    --neon-yellow: #ffe600;
+    --neon-green: #39ff14;
+    --neon-purple: #bf5af2;
+    --neon-orange: #ff6b00;
+    --deep-bg: #020810;
+    --mid-bg: #050e1a;
+    --card-bg: rgba(0,20,40,0.85);
+    --glass: rgba(0,245,255,0.05);
+    --border-glow: rgba(0,245,255,0.3);
+    --text-main: #e0f7ff;
+    --text-dim: #7ab8cc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--deep-bg);
+    font-family: 'Rajdhani', sans-serif;
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── Animated Background ── */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gridShift 20s linear infinite;
+  }
+  @keyframes gridShift { from { background-position: 0 0; } to { background-position: 40px 40px; } }
+
+  .bg-orbs {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  }
+  .orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); opacity: 0.18;
+    animation: orbFloat 8s ease-in-out infinite;
+  }
+  .orb1 { width:500px; height:500px; background: var(--neon-cyan); top:-100px; left:-100px; animation-delay:0s; }
+  .orb2 { width:400px; height:400px; background: var(--neon-pink); top:30%; right:-100px; animation-delay:-3s; }
+  .orb3 { width:350px; height:350px; background: var(--neon-purple); bottom:-80px; left:20%; animation-delay:-5s; }
+  .orb4 { width:300px; height:300px; background: var(--neon-yellow); bottom:10%; right:20%; animation-delay:-2s; }
+  @keyframes orbFloat {
+    0%,100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.05); }
+  }
+
+  /* ── Floating Paw Particles ── */
+  .paw-particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .paw { position: absolute; font-size: 1.2rem; opacity: 0; animation: pawRain linear infinite; }
+  @keyframes pawRain {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.4; }
+    90% { opacity: 0.2; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ── Header ── */
+  .header {
+    position: relative; z-index: 10;
+    text-align: center;
+    padding: 2.5rem 1rem 1.5rem;
+  }
+  .logo-ring {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: 2px solid var(--neon-cyan);
+    box-shadow: 0 0 30px var(--neon-cyan), inset 0 0 30px rgba(0,245,255,0.1);
+    font-size: 3rem; margin-bottom: 1rem;
+    animation: ringPulse 3s ease-in-out infinite;
+    background: radial-gradient(circle, rgba(0,245,255,0.15), transparent);
+  }
+  @keyframes ringPulse {
+    0%,100% { box-shadow: 0 0 30px var(--neon-cyan), inset 0 0 30px rgba(0,245,255,0.1); }
+    50% { box-shadow: 0 0 60px var(--neon-cyan), 0 0 120px rgba(0,245,255,0.3), inset 0 0 40px rgba(0,245,255,0.2); }
+  }
+  .site-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink), var(--neon-yellow), var(--neon-cyan));
+    background-size: 300% 300%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: titleShimmer 4s ease infinite;
+    letter-spacing: 0.05em;
+  }
+  @keyframes titleShimmer {
+    0%,100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .site-subtitle {
+    font-family: 'Space Mono', monospace;
+    color: var(--neon-cyan); font-size: 0.75rem; letter-spacing: 0.3em;
+    text-transform: uppercase; margin-top: 0.3rem;
+    opacity: 0.8;
+  }
+
+  /* ── Status Bar ── */
+  .status-bar {
+    display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+    padding: 0.6rem 2rem; margin: 0.5rem auto;
+    max-width: 600px;
+    background: rgba(0,245,255,0.04);
+    border: 1px solid rgba(0,245,255,0.15);
+    border-radius: 50px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.1em;
+    color: var(--text-dim);
+    position: relative; z-index: 10;
+  }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--neon-green); animation: blink 1.5s infinite; flex-shrink: 0; }
+  @keyframes blink { 0%,100%{opacity:1; box-shadow:0 0 8px var(--neon-green);} 50%{opacity:0.3; box-shadow:none;} }
+  .stat-badge {
+    background: rgba(0,245,255,0.08); border: 1px solid rgba(0,245,255,0.2);
+    border-radius: 20px; padding: 0.2rem 0.6rem; color: var(--neon-cyan);
+    font-size: 0.6rem;
+  }
+
+  /* ── Main Chat Container ── */
+  .chat-wrapper {
+    position: relative; z-index: 10;
+    max-width: 860px; margin: 0 auto;
+    padding: 0 1rem 2rem;
+  }
+
+  .chat-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--border-glow);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(0,245,255,0.08), 0 40px 80px rgba(0,0,0,0.6);
+    backdrop-filter: blur(20px);
+  }
+
+  /* ── Chat Header ── */
+  .chat-header {
+    background: linear-gradient(135deg, rgba(0,245,255,0.1), rgba(255,0,110,0.1), rgba(191,90,242,0.1));
+    border-bottom: 1px solid var(--border-glow);
+    padding: 1rem 1.5rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .bot-avatar {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 0 20px rgba(0,245,255,0.5);
+    flex-shrink: 0;
+    animation: avatarGlow 3s ease-in-out infinite;
+  }
+  @keyframes avatarGlow {
+    0%,100% { box-shadow: 0 0 20px rgba(0,245,255,0.5); }
+    50% { box-shadow: 0 0 40px rgba(0,245,255,0.8), 0 0 60px rgba(255,0,110,0.3); }
+  }
+  .bot-info { flex: 1; }
+  .bot-name { font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 700; color: var(--neon-cyan); }
+  .bot-desc { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.15rem; }
+  .live-badge {
+    background: linear-gradient(135deg, var(--neon-green), #00cc00);
+    color: #001000; font-family: 'Space Mono', monospace; font-size: 0.6rem;
+    font-weight: 700; padding: 0.25rem 0.7rem; border-radius: 20px;
+    letter-spacing: 0.1em; animation: badgePulse 2s ease-in-out infinite;
+  }
+  @keyframes badgePulse { 0%,100%{opacity:1;} 50%{opacity:0.7;} }
+
+  /* ── Quick Questions ── */
+  .quick-questions {
+    padding: 1rem 1.5rem 0.5rem;
+    border-bottom: 1px solid rgba(0,245,255,0.08);
+  }
+  .qq-label { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em; color: var(--text-dim); margin-bottom: 0.6rem; text-transform: uppercase; }
+  .qq-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .qq-chip {
+    background: rgba(0,245,255,0.06); border: 1px solid rgba(0,245,255,0.2);
+    border-radius: 20px; padding: 0.3rem 0.8rem;
+    font-size: 0.75rem; color: var(--neon-cyan);
+    cursor: pointer; transition: all 0.2s ease;
+    font-family: 'Rajdhani', sans-serif; font-weight: 500;
+  }
+  .qq-chip:hover { background: rgba(0,245,255,0.15); border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0,245,255,0.3); transform: translateY(-1px); }
+
+  /* ── Messages ── */
+  .messages {
+    height: 420px; overflow-y: auto;
+    padding: 1.5rem;
+    scroll-behavior: smooth;
+  }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 2px; opacity: 0.5; }
+
+  .msg { display: flex; gap: 0.75rem; margin-bottom: 1.2rem; animation: msgIn 0.35s ease; }
+  @keyframes msgIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+  .msg.user { flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; font-weight: bold;
+  }
+  .msg-avatar.bot {
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    box-shadow: 0 0 12px rgba(0,245,255,0.4);
+    font-size: 1.1rem;
+  }
+  .msg-avatar.user-av {
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-orange));
+    box-shadow: 0 0 12px rgba(255,0,110,0.4);
+    font-size: 0.75rem; font-family: 'Orbitron',monospace; color: #fff;
+  }
+
+  .msg-bubble {
+    max-width: 72%; padding: 0.85rem 1.1rem;
+    border-radius: 18px; font-size: 0.9rem; line-height: 1.6;
+    position: relative;
+  }
+  .msg.bot .msg-bubble {
+    background: rgba(0,245,255,0.07);
+    border: 1px solid rgba(0,245,255,0.2);
+    border-radius: 4px 18px 18px 18px;
+    color: var(--text-main);
+  }
+  .msg.user .msg-bubble {
+    background: linear-gradient(135deg, rgba(255,0,110,0.2), rgba(255,107,0,0.2));
+    border: 1px solid rgba(255,0,110,0.3);
+    border-radius: 18px 4px 18px 18px;
+    color: var(--text-main);
+  }
+  .msg-time { font-family: 'Space Mono',monospace; font-size: 0.55rem; color: var(--text-dim); margin-top: 0.3rem; display: block; }
+
+  .msg-bubble a { color: var(--neon-yellow); text-decoration: underline; }
+  .msg-bubble strong { color: var(--neon-cyan); }
+  .msg-bubble em { color: var(--neon-pink); font-style: normal; font-weight: 600; }
+  .msg-bubble .tag { display: inline-block; background: rgba(0,245,255,0.1); border: 1px solid rgba(0,245,255,0.3); border-radius: 4px; padding: 0 0.3rem; font-size: 0.8em; color: var(--neon-cyan); margin: 0.1rem; }
+
+  /* Typing indicator */
+  .typing-dots { display: flex; gap: 4px; padding: 0.6rem 0.3rem; }
+  .typing-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--neon-cyan); animation: dotBounce 1s ease-in-out infinite; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes dotBounce { 0%,80%,100%{transform:scale(0.6); opacity:0.5;} 40%{transform:scale(1); opacity:1;} }
+
+  /* ── Input Area ── */
+  .input-area {
+    border-top: 1px solid var(--border-glow);
+    padding: 1rem 1.5rem;
+    background: rgba(0,5,15,0.5);
+  }
+  .input-row { display: flex; gap: 0.75rem; align-items: flex-end; }
+  .input-field {
+    flex: 1;
+    background: rgba(0,245,255,0.05);
+    border: 1px solid rgba(0,245,255,0.25);
+    border-radius: 16px;
+    padding: 0.85rem 1.1rem;
+    font-family: 'Rajdhani', sans-serif; font-size: 0.95rem;
+    color: var(--text-main); outline: none;
+    transition: all 0.2s ease; resize: none;
+    max-height: 120px;
+  }
+  .input-field::placeholder { color: var(--text-dim); }
+  .input-field:focus { border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(0,245,255,0.15); background: rgba(0,245,255,0.08); }
+
+  .send-btn {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    border: none; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; transition: all 0.2s ease;
+    box-shadow: 0 0 20px rgba(0,245,255,0.3);
+  }
+  .send-btn:hover { transform: scale(1.1); box-shadow: 0 0 35px rgba(0,245,255,0.6); }
+  .send-btn:active { transform: scale(0.95); }
+
+  /* ── Footer Link ── */
+  .footer-link {
+    text-align: center; padding: 1.5rem 1rem 2rem;
+    position: relative; z-index: 10;
+  }
+  .official-btn {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    background: linear-gradient(135deg, rgba(255,230,0,0.1), rgba(255,107,0,0.1));
+    border: 1px solid var(--neon-yellow);
+    color: var(--neon-yellow); text-decoration: none;
+    font-family: 'Orbitron', monospace; font-size: 0.8rem; font-weight: 600;
+    padding: 0.9rem 2rem; border-radius: 50px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(255,230,0,0.15);
+  }
+  .official-btn:hover {
+    background: linear-gradient(135deg, rgba(255,230,0,0.2), rgba(255,107,0,0.2));
+    box-shadow: 0 0 40px rgba(255,230,0,0.4), 0 0 80px rgba(255,107,0,0.2);
+    transform: translateY(-2px);
+  }
+  .insta-btn {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    background: linear-gradient(135deg, rgba(255,0,110,0.1), rgba(191,90,242,0.1));
+    border: 1px solid var(--neon-pink);
+    color: var(--neon-pink); text-decoration: none;
+    font-family: 'Orbitron', monospace; font-size: 0.75rem; font-weight: 600;
+    padding: 0.75rem 1.5rem; border-radius: 50px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    transition: all 0.3s ease; margin-left: 0.75rem;
+    box-shadow: 0 0 15px rgba(255,0,110,0.15);
+  }
+  .insta-btn:hover { box-shadow: 0 0 30px rgba(255,0,110,0.4); transform: translateY(-2px); }
+
+  /* ── Scanline effect ── */
+  .scanlines {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  }
+
+  /* ── Responsive ── */
+  @media(max-width:600px) {
+    .messages { height: 340px; }
+    .qq-chip { font-size: 0.68rem; }
+    .status-bar { flex-wrap: wrap; gap: 0.5rem; justify-content: center; font-size: 0.58rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Backgrounds -->
+<div class="bg-grid"></div>
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="orb orb4"></div>
+</div>
+<div class="scanlines"></div>
+<div class="paw-particles" id="pawParticles"></div>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo-ring">🐾</div>
+  <div class="site-title">PawBot</div>
+  <div class="site-subtitle">PawVibesZ AI Assistant · Cats on Zoom</div>
+</div>
+
+<!-- Status Bar -->
+<div class="status-bar">
+  <div class="status-dot"></div>
+  <span>ONLINE</span>
+  <span class="stat-badge">🐱 70+ CATS</span>
+  <span class="stat-badge">🌍 20+ COUNTRIES</span>
+  <span class="stat-badge">✨ €8/SESSION</span>
+  <span class="stat-badge">⚡ AI POWERED</span>
+</div>
+
+<!-- Chat -->
+<div class="chat-wrapper">
+  <div class="chat-panel">
+
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <div class="bot-avatar">🤖</div>
+      <div class="bot-info">
+        <div class="bot-name">PAWBOT v2.0</div>
+        <div class="bot-desc">Your guide to the world's first Cats on Zoom platform</div>
+      </div>
+      <div class="live-badge">● LIVE</div>
+    </div>
+
+    <!-- Quick Questions -->
+    <div class="quick-questions">
+      <div class="qq-label">⚡ Quick questions</div>
+      <div class="qq-chips" id="qqChips">
+        <span class="qq-chip" onclick="askQ('What is PawVibesZ?')">🐱 What is PawVibesZ?</span>
+        <span class="qq-chip" onclick="askQ('How much does a session cost?')">💰 Pricing</span>
+        <span class="qq-chip" onclick="askQ('How do I book a session?')">📅 How to book</span>
+        <span class="qq-chip" onclick="askQ('What countries are available?')">🌍 Countries</span>
+        <span class="qq-chip" onclick="askQ('Show me cats in Spain')">🇪🇸 Cats in Spain</span>
+        <span class="qq-chip" onclick="askQ('Show me cats in Philippines')">🇵🇭 Philippines cats</span>
+        <span class="qq-chip" onclick="askQ('Tell me about the science of cat therapy')">🔬 Cat science</span>
+        <span class="qq-chip" onclick="askQ('What are the health benefits?')">💚 Health benefits</span>
+        <span class="qq-chip" onclick="askQ('Show me all cats in US')">🇺🇸 US cats</span>
+        <span class="qq-chip" onclick="askQ('Cats in Germany')">🇩🇪 Germany cats</span>
+        <span class="qq-chip" onclick="askQ('Find Jeeves the cat')">🕵️ Find Jeeves</span>
+        <span class="qq-chip" onclick="askQ('What is the Instagram?')">📸 Instagram</span>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages" id="messages"></div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+      <div class="input-row">
+        <textarea class="input-field" id="userInput" placeholder="Ask me about cats, sessions, hosts, locations…" rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"
+          oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="sendMsg()" title="Send">🐾</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer-link">
+  <a href="https://paniaguai.github.io/pawz/" target="_blank" class="official-btn">🐾 Visit Official PawVibesZ Site</a>
+  <a href="https://www.instagram.com/pawvibesz/" target="_blank" class="insta-btn">📸 @pawvibesz</a>
+</div>
+
+<script>
+// ── Paw Particle Rain ──
+const pawContainer = document.getElementById('pawParticles');
+const PAWS = ['🐾','🐱','😸','😻','🐈','😺','😽'];
+for (let i = 0; i < 25; i++) {
+  const p = document.createElement('div');
+  p.className = 'paw';
+  p.textContent = PAWS[Math.floor(Math.random() * PAWS.length)];
+  p.style.left = Math.random() * 100 + 'vw';
+  p.style.animationDuration = (8 + Math.random() * 12) + 's';
+  p.style.animationDelay = (Math.random() * 15) + 's';
+  p.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
+  pawContainer.appendChild(p);
+}
+
+// ── Knowledge Base ──
+const KB = {
+  // Platform info
+  platform: {
+    name: "PawVibesZ",
+    tagline: "The World's First Cats on Zoom Platform",
+    description: "PawVibesZ lets you meet a real cat over Zoom for a few minutes of mindful presence — purring, kindness, calm breathing, and genuine connection.",
+    cats: "70+",
+    countries: "20+",
+    hosts: "50+",
+    soloPrice: "€8",
+    groupPrice: "€80",
+    website: "https://paniaguai.github.io/pawz/",
+    calmSite: "https://paniaguai.github.io/calm/",
+    instagram: "https://www.instagram.com/pawvibesz/",
+    instagramHandle: "@pawvibesz",
+    bookingForm: "https://forms.gle/bnT7VsrdPXLXrz3G9",
+    stripeSolo: "https://buy.stripe.com/cNi6oGfqL4SHdrg7w40Jq04",
+    stripeGroup: "https://buy.stripe.com/aFadR892nad186W7w40Jq05",
+    paypal: "https://www.paypal.com/paypalme/okgomeet"
+  },
+
+  // All cats by region
+  cats: {
+    "Spain": [
+      { human: "Silvia", cats: ["Yumi"], location: "Cáceres", ig: "https://www.instagram.com/pawvibesz/p/DMSQEwtMVvz/" },
+      { human: "Betinna", cats: ["Sassy"], location: "Cantabria", ig: "https://www.instagram.com/pawvibesz/p/DMahTiMtLYX/" },
+      { human: "Ayelén", cats: ["Eo", "Ginebra"], location: "Valencia", ig: "https://www.instagram.com/pawvibesz/p/DMcdX4sMXMO/" },
+      { human: "John", cats: ["Murfie", "Gilbert"], location: "Valencia", ig: "https://www.instagram.com/pawvibesz/p/DMXsYtWNPJQ/" },
+      { human: "María", cats: ["Cendra", "Van Gogh"], location: "Castellón", ig: "https://www.instagram.com/pawvibesz/p/DMczrbKNFlT/" },
+      { human: "Célia", cats: ["Pulpo"], location: "Madrid", ig: "https://www.instagram.com/pawvibesz/p/DMacsnttKXf/" },
+      { human: "Montse", cats: ["Olaf"], location: "Madrid", ig: "https://www.instagram.com/pawvibesz/p/DMZoZUjtkZl/" },
+      { human: "Nevena", cats: ["Josefine"], location: "Gran Canaria", ig: "https://www.instagram.com/p/DMxdFN-tIRA/" },
+      { human: "Letizia", cats: ["Iris"], location: "Tenerife", ig: "https://www.instagram.com/pawvibesz/p/DMXsUP_tG78/" },
+      { human: "Josefina", cats: ["Rayas"], location: "Cataluña", ig: "https://www.instagram.com/pawvibesz/p/DK_200qtaaX/" },
+      { human: "Anastasia", cats: ["Osi"], location: "Barcelona", ig: "https://www.instagram.com/pawvibesz/p/DLiKv5WNt1G/" },
+      { human: "Lina", cats: ["Bagui", "Fede"], location: "Barcelona", ig: "https://www.instagram.com/pawvibesz/p/DQewK8ZDHM-/" },
+      { human: "Marco", cats: ["Cheto"], location: "Barcelona", ig: "https://www.instagram.com/pawvibesz/p/DMx-9hSNX3O/" },
+      { human: "Sylvia", cats: ["Max"], location: "Córdoba", ig: "https://www.instagram.com/pawvibesz/p/DLsRA81NLmp/" },
+      { human: "Ashley", cats: ["Apollo"], location: "Orihuela", ig: "https://www.instagram.com/catswoppr/reel/DSRv-j-jYn7/" }
+    ],
+    "United States": [
+      { human: "Cristina", cats: ["Boobie"], location: "New Mexico", ig: "https://www.instagram.com/p/DT5gAvkDJ6F/" },
+      { human: "Jasmin", cats: ["Sir Fluffy"], location: "Texas", ig: "https://www.instagram.com/pawvibesz/p/DYMrA9wDFiT/" },
+      { human: "Deven", cats: ["Chino"], location: "Michigan", ig: "https://www.instagram.com/pawvibesz/p/DYMrOHqDLNu/" },
+      { human: "Jasmine", cats: ["Albert"], location: "Maryland", ig: "https://www.instagram.com/p/DT0gQKrDK0S/" },
+      { human: "Laird", cats: ["Gino", "Seacat"], location: "Chagrin Falls, Ohio", ig: "https://www.instagram.com/pawvibesz/p/DObiX8QjIS4/" },
+      { human: "Chasity", cats: ["Athena", "Aries", "Luna"], location: "Louisiana", ig: "https://www.instagram.com/p/DUEOIgLjp7F/" },
+      { human: "JayleAna", cats: ["Evangeline"], location: "Tennessee", ig: "https://www.instagram.com/pawvibesz/p/DOdFIjejIrU/" },
+      { human: "Saddie", cats: ["Goodwill", "Butter"], location: "Denver, CO", ig: "https://www.instagram.com/pawvibesz/p/DMzf132sfL2/" },
+      { human: "Mitch", cats: ["Gittel"], location: "Washington D.C.", ig: "https://www.instagram.com/pawvibesz/p/DQl5FWRjKaF/" },
+      { human: "Stefen", cats: ["Bello"], location: "Philadelphia", ig: "https://www.instagram.com/pawvibesz/p/DOYOdI-DIBK/" }
+    ],
+    "Philippines": [
+      { human: "Arianne", cats: ["Lanter"], location: "Philippines", ig: "https://www.instagram.com/p/DUAsFOPDBTp/" },
+      { human: "Princess", cats: ["Nami", "Tito"], location: "Cavite", ig: "https://www.instagram.com/p/DT-Cqk0jL8R/" },
+      { human: "Luna", cats: ["Spanky", "Cinnamon"], location: "Philippines", ig: "https://www.instagram.com/p/DOI2phaDB30/" },
+      { human: "JD", cats: ["Thomas"], location: "Philippines", ig: "https://www.instagram.com/p/DUS1Wt5jEWT/" },
+      { human: "Dynne", cats: ["Cloudy"], location: "Philippines", ig: "https://www.instagram.com/p/DOImw_MjLSf/" },
+      { human: "Aimee", cats: ["Smokey"], location: "Philippines", ig: "https://www.instagram.com/pawvibesz/p/DMSj2v6tjGh/" },
+      { human: "Lou", cats: ["Logan"], location: "Philippines", ig: "https://www.instagram.com/reels/DUp8Uk7DEeY/" }
+    ],
+    "Indonesia": [
+      { human: "Dina", cats: ["Himler", "PonPon"], location: "Indonesia", ig: "https://www.instagram.com/pawvibesz/reel/DRUP6xKjOWY/" },
+      { human: "Cia", cats: ["Abu"], location: "Jakarta", ig: "https://www.instagram.com/pawvibesz/p/DMVxJR9sJ3H/" },
+      { human: "Sekar", cats: ["Miyu"], location: "Jakarta", ig: "https://www.instagram.com/pawvibesz/p/DMxDywrM-GL/" }
+    ],
+    "Germany": [
+      { human: "Barbara", cats: ["Pixel", "Critic"], location: "Hamburg", ig: "https://www.instagram.com/p/DVqNwM4jKyk/" },
+      { human: "Stephanie", cats: ["Barnabey"], location: "Munich", ig: "https://www.instagram.com/pawvibesz/p/DMxOmMHsXLj/" },
+      { human: "Finola", cats: ["Yoko", "Ushy"], location: "Hamburg", ig: "https://www.instagram.com/p/DTurZ18DPcX/" }
+    ],
+    "UK & Ireland": [
+      { human: "Annie", cats: ["Jeeves"], location: "London (on a boat!)", ig: "https://www.instagram.com/pawvibesz/p/DPg6LoAjJ8N/" },
+      { human: "Lucy", cats: ["Keeva"], location: "Cheshire", ig: "https://www.instagram.com/p/DVikRkxjJK4/" },
+      { human: "Sara", cats: ["Aysha"], location: "London", ig: "https://www.instagram.com/p/DUnO-iJDELr/" },
+      { human: "Fátima", cats: ["Maggie"], location: "Dublin, Ireland", ig: "https://www.instagram.com/p/DWHdSK_DEbf/" }
+    ],
+    "Europe": [
+      { human: "Anastasia", cats: ["Frankie"], location: "Italy", ig: "https://www.instagram.com/pawvibesz/p/DRSOXJyjA1J/" },
+      { human: "Beatrice", cats: ["Cesare"], location: "Zurich, Switzerland", ig: "https://www.instagram.com/p/DRjXIJaDFob/" },
+      { human: "Ana", cats: ["Lluna"], location: "Amsterdam, Netherlands", ig: "https://www.instagram.com/pawvibesz/p/DQHdEJSDEZO/" },
+      { human: "Myrto", cats: ["Sue"], location: "Greece", ig: "https://www.instagram.com/pawvibesz/p/DL6047GNs3_/" },
+      { human: "Prana", cats: ["Halloween", "Luna"], location: "Cyprus", ig: "https://www.instagram.com/pawvibesz/p/DMSyS4fNFbl/" },
+      { human: "Karolina", cats: ["Mitti", "Luna"], location: "Poland", ig: "https://www.instagram.com/pawvibesz/p/DLnErFms9q5/" },
+      { human: "Gusté", cats: ["Kosmosis", "Principle"], location: "Lithuania", ig: "https://www.instagram.com/pawvibesz/p/DMZvZd-N5lg/" },
+      { human: "Nez", cats: ["Que"], location: "Baku, Azerbaijan", ig: "https://www.instagram.com/pawvibesz/p/DMU0FOCsdN9/" }
+    ],
+    "Africa": [
+      { human: "Kammy", cats: ["Honey", "Luna"], location: "Johannesburg, South Africa", ig: "https://www.instagram.com/p/DQ81RFoDLrR/" },
+      { human: "Theresa", cats: ["Molly"], location: "Johannesburg, South Africa", ig: "https://www.instagram.com/pawvibesz/p/DRg359_DJYp/" }
+    ],
+    "Portugal": [
+      { human: "Kirana", cats: ["Garfield"], location: "Portugal", ig: "https://www.instagram.com/pawvibesz/p/DPywCUkjB-y/" }
+    ],
+    "Canada": [
+      { human: "Tracey", cats: ["Kitty"], location: "Montréal", ig: "https://www.instagram.com/pawvibesz/p/DQHdlvijDXc/" }
+    ],
+    "East & SE Asia": [
+      { human: "Pepe-san", cats: ["Kotaro", "Kojiro"], location: "Tokyo, Japan", ig: "https://www.instagram.com/p/DVI5g5yjGCH/" },
+      { human: "Melissa", cats: ["Ava"], location: "Seoul, South Korea", ig: "https://www.instagram.com/pawvibesz/p/DQtxDiODIkF/" },
+      { human: "Sharifa", cats: ["Chewy"], location: "Singapore", ig: "https://www.instagram.com/pawvibesz/p/DRuPvkrjPHY/" }
+    ],
+    "Central America": [
+      { human: "Sofía", cats: ["Gordo"], location: "El Salvador", ig: "https://www.instagram.com/pawvibesz/p/DMa0nNst1rx/" },
+      { human: "Fiorella", cats: ["Kevin"], location: "Costa Rica", ig: "https://www.instagram.com/pawvibesz/p/DMTLuqesYLc/" }
+    ]
+  },
+
+  // Science & Benefits
+  science: {
+    purrFrequency: "25–50 Hz",
+    stressReduction: "68% reduction in self-reported stress after animal-assisted interactions",
+    timeToCalm: "8 minutes average to feel measurably calmer",
+    benefits: ["Cortisol drops", "Oxytocin release", "Better sleep", "Lower blood pressure", "Improved focus", "Reduced anxiety", "More laughter"]
+  },
+
+  // Testimonials
+  testimonials: [
+    { name: "Sarah M.", location: "London 🇬🇧", cat: "Jeeves", quote: "Ten minutes with Jeeves and I felt like an actual human again." },
+    { name: "Rodrigo A.", location: "Barcelona 🇪🇸", cat: "Cheto", quote: "Cheto knocked over a water glass and it was the highlight of my week." },
+    { name: "Mia T.", location: "New York 🇺🇸", quote: "I use this before big presentations. Pure medicine." },
+    { name: "Hiroshi K.", location: "Tokyo 🇯🇵", quote: "My therapist charges €150/hour. PawVibesZ charges €8. Both helpful." }
+  ]
+};
+
+// ── Find a cat by name ──
+function findCatByName(name) {
+  name = name.toLowerCase();
+  for (const [region, cats] of Object.entries(KB.cats)) {
+    for (const entry of cats) {
+      const allNames = [entry.human, ...entry.cats].map(n => n.toLowerCase());
+      if (allNames.some(n => n.includes(name))) {
+        return { ...entry, region };
+      }
+    }
+  }
+  return null;
+}
+
+// ── Format cat list for a region ──
+function formatCatList(region) {
+  const list = KB.cats[region];
+  if (!list) return null;
+  return list.map(e =>
+    `<div style="margin:0.3rem 0; padding: 0.4rem 0.6rem; background:rgba(0,245,255,0.05); border-left:2px solid var(--neon-cyan); border-radius:0 8px 8px 0;">
+      🐱 <strong>${e.human}</strong> & <em>${e.cats.join(', ')}</em> — ${e.location}
+      <br><a href="${e.ig}" target="_blank" style="font-size:0.78em;">📸 View on Instagram</a>
+    </div>`
+  ).join('');
+}
+
+// ── NLP / Intent Matching ──
+function getResponse(input) {
+  const q = input.toLowerCase().trim();
+
+  // Greetings
+  if (/^(hi|hello|hey|hola|bonjour|ciao|howdy|sup|yo|meow|purr)/.test(q)) {
+    return `😸 <strong>Meow! Welcome to PawVibesZ!</strong><br><br>I'm PawBot, your guide to the world's first Cats on Zoom platform! 🐾<br><br>We connect you with <strong>70+ real cats</strong> across <strong>20+ countries</strong> for live Zoom sessions. Each session is <strong>€8</strong> — less than a coffee, but way more purring. 😻<br><br>What would you like to know? You can ask me about cats, pricing, how to book, the science of cat therapy, specific hosts, or locations!`;
+  }
+
+  // What is PawVibesZ
+  if (q.includes('what is') || q.includes('tell me about pawvibes') || q.includes('explain')) {
+    return `🌍 <strong>PawVibesZ</strong> is <em>the world's first Cats on Zoom platform</em>!<br><br>Here's the concept: you book a short video call on Zoom and meet a real, living, purring cat (and their human host) from somewhere around the world. No scripts, no agendas — just a few minutes of genuine, warm presence.<br><br>🐾 <strong>${KB.platform.cats}</strong> real cats<br>🌍 <strong>${KB.platform.countries}</strong> countries<br>👥 <strong>${KB.platform.hosts}</strong> host specialists<br>💸 Solo sessions from <strong>€8</strong><br><br>The platform was born to counter screen fatigue, loneliness, and the burnout of modern life. A cat doesn't know what LinkedIn is — and that's exactly the medicine we need.<br><br><a href="${KB.platform.website}" target="_blank">🐾 Visit the official site →</a>`;
+  }
+
+  // Pricing
+  if (q.includes('price') || q.includes('cost') || q.includes('how much') || q.includes('€') || q.includes('euro') || q.includes('pay')) {
+    return `💰 <strong>PawVibesZ Pricing</strong> — Simple & Affordable:<br><br>
+<div style="display:grid;gap:0.5rem;margin:0.5rem 0;">
+  <div style="padding:0.7rem;background:rgba(0,245,255,0.08);border:1px solid rgba(0,245,255,0.3);border-radius:10px;">
+    😸 <strong>Solo Session</strong> — <em>€8</em><br><small>One-on-one with a cat + host on Zoom</small><br>
+    <a href="${KB.platform.stripeSolo}" target="_blank">💳 Book via Stripe →</a>
+  </div>
+  <div style="padding:0.7rem;background:rgba(255,0,110,0.08);border:1px solid rgba(255,0,110,0.3);border-radius:10px;">
+    👥 <strong>Group Session</strong> — <em>€80</em><br><small>Teams, friends, book clubs — cat cures Zoom fatigue!</small><br>
+    <a href="${KB.platform.stripeGroup}" target="_blank">💳 Book Group via Stripe →</a>
+  </div>
+  <div style="padding:0.7rem;background:rgba(191,90,242,0.08);border:1px solid rgba(191,90,242,0.3);border-radius:10px;">
+    💙 <strong>Pay with PayPal</strong><br>
+    <a href="${KB.platform.paypal}" target="_blank">PayPal → paypal.me/okgomeet</a>
+  </div>
+</div>
+At €8, it costs <em>less than most coffees</em> and the ROI is purring! 😸`;
+  }
+
+  // How to book
+  if (q.includes('book') || q.includes('schedule') || q.includes('how do i') || q.includes('how to')) {
+    return `📅 <strong>Booking a PawVibesZ Session</strong> is super easy — 4 steps:<br><br>
+<div style="counter-reset:steps;">
+  <div style="margin:0.4rem 0;padding:0.6rem;background:rgba(0,245,255,0.05);border-radius:8px;">🐱 <strong>1. Pick a Cat</strong> — Browse 70+ cats and find your vibe match</div>
+  <div style="margin:0.4rem 0;padding:0.6rem;background:rgba(255,230,0,0.05);border-radius:8px;">💳 <strong>2. Book & Pay</strong> — €8 solo or €80 group via <a href="${KB.platform.stripeSolo}" target="_blank">Stripe</a> or <a href="${KB.platform.paypal}" target="_blank">PayPal</a></div>
+  <div style="margin:0.4rem 0;padding:0.6rem;background:rgba(255,107,0,0.05);border-radius:8px;">📝 <strong>3. Schedule</strong> — Fill the <a href="${KB.platform.bookingForm}" target="_blank">booking form</a> with your chosen cat + date/time</div>
+  <div style="margin:0.4rem 0;padding:0.6rem;background:rgba(57,255,20,0.05);border-radius:8px;">😌 <strong>4. Breathe & Reset</strong> — Join Zoom and let the purring do its magic!</div>
+</div>
+<br><a href="${KB.platform.bookingForm}" target="_blank">📅 Go to Booking Form →</a>`;
+  }
+
+  // Countries / locations
+  if (q.includes('countr') || q.includes('where') || q.includes('location') || q.includes('available')) {
+    return `🌍 <strong>PawVibesZ is in 20+ Countries!</strong><br><br>
+🇪🇸 Spain · 🇵🇭 Philippines · 🇺🇸 United States · 🇩🇪 Germany · 🇬🇧 UK · 🇮🇩 Indonesia · 🇵🇹 Portugal · 🇨🇦 Canada · 🇯🇵 Japan · 🇰🇷 South Korea · 🇸🇬 Singapore · 🇳🇱 Netherlands · 🇨🇭 Switzerland · 🇬🇷 Greece · 🇮🇹 Italy · 🇮🇪 Ireland · 🇵🇱 Poland · 🇿🇦 South Africa · 🇸🇻 El Salvador · 🇨🇷 Costa Rica · 🇨🇾 Cyprus · 🇱🇹 Lithuania · 🇦🇿 Azerbaijan<br><br>
+Ask me about cats in a specific country — like "cats in Spain" or "Japan cats"! 😸`;
+  }
+
+  // Spain cats
+  if (q.includes('spain') || q.includes('españa') || q.includes('madrid') || q.includes('barcelona') || q.includes('valencia') || q.includes('cáceres') || q.includes('caceres') || q.includes('tenerife') || q.includes('gran canaria') || q.includes('cantabria') || q.includes('castellón') || q.includes('córdoba') || q.includes('orihuela') || q.includes('cataluña')) {
+    return `🇪🇸 <strong>Cats in Spain (15 hosts!)</strong><br><br>${formatCatList('Spain')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book a Spanish cat session →</a>`;
+  }
+
+  // US cats
+  if (q.includes('united states') || q.includes('us cats') || q.includes('usa') || q.includes('america') || q.includes('texas') || q.includes('michigan') || q.includes('maryland') || q.includes('louisiana') || q.includes('tennessee') || q.includes('denver') || q.includes('washington d') || q.includes('philadelphia') || q.includes('ohio') || q.includes('new mexico')) {
+    return `🇺🇸 <strong>Cats in the United States (10 hosts!)</strong><br><br>${formatCatList('United States')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book a US cat session →</a>`;
+  }
+
+  // Philippines cats
+  if (q.includes('philippine') || q.includes('cavite')) {
+    return `🇵🇭 <strong>Cats in the Philippines (7 hosts!)</strong><br><br>${formatCatList('Philippines')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book a Philippines cat session →</a>`;
+  }
+
+  // Indonesia cats
+  if (q.includes('indonesia') || q.includes('jakarta')) {
+    return `🇮🇩 <strong>Cats in Indonesia (3 hosts)</strong><br><br>${formatCatList('Indonesia')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book an Indonesia cat session →</a>`;
+  }
+
+  // Germany cats
+  if (q.includes('german') || q.includes('hamburg') || q.includes('munich')) {
+    return `🇩🇪 <strong>Cats in Germany (3 hosts)</strong><br><br>${formatCatList('Germany')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book a German cat session →</a>`;
+  }
+
+  // UK & Ireland cats
+  if (q.includes('uk') || q.includes('united kingdom') || q.includes('england') || q.includes('ireland') || q.includes('london') || q.includes('cheshire') || q.includes('dublin')) {
+    return `🇬🇧 <strong>Cats in UK & Ireland (4 hosts)</strong><br><br>${formatCatList('UK & Ireland')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book a UK/Ireland cat session →</a>`;
+  }
+
+  // Europe (other)
+  if (q.includes('europe') || q.includes('italy') || q.includes('switzerland') || q.includes('amsterdam') || q.includes('netherlands') || q.includes('greece') || q.includes('cyprus') || q.includes('poland') || q.includes('lithuania') || q.includes('azerbaijan') || q.includes('baku') || q.includes('zurich')) {
+    return `🇪🇺 <strong>Cats in Europe (8 hosts!)</strong><br><br>${formatCatList('Europe')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book a European cat session →</a>`;
+  }
+
+  // Africa
+  if (q.includes('africa') || q.includes('johannesburg') || q.includes('south africa')) {
+    return `🌍 <strong>Cats in Africa (2 hosts)</strong><br><br>${formatCatList('Africa')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book a session →</a>`;
+  }
+
+  // Japan/Asia
+  if (q.includes('japan') || q.includes('tokyo') || q.includes('korea') || q.includes('seoul') || q.includes('singapore') || q.includes('asia')) {
+    return `🌏 <strong>Cats in East & SE Asia (3 hosts)</strong><br><br>${formatCatList('East & SE Asia')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book an Asia cat session →</a>`;
+  }
+
+  // Central America
+  if (q.includes('central america') || q.includes('el salvador') || q.includes('costa rica')) {
+    return `🌎 <strong>Cats in Central America (2 hosts)</strong><br><br>${formatCatList('Central America')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book a session →</a>`;
+  }
+
+  // Canada
+  if (q.includes('canada') || q.includes('montréal') || q.includes('montreal')) {
+    return `🇨🇦 <strong>Cats in Canada</strong><br><br>${formatCatList('Canada')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book a session →</a>`;
+  }
+
+  // Portugal
+  if (q.includes('portugal')) {
+    return `🇵🇹 <strong>Cats in Portugal</strong><br><br>${formatCatList('Portugal')}<br><a href="${KB.platform.website}" target="_blank">🐾 Book a session →</a>`;
+  }
+
+  // Science / health benefits
+  if (q.includes('science') || q.includes('research') || q.includes('benefit') || q.includes('health') || q.includes('therapy') || q.includes('cortisol') || q.includes('purr') || q.includes('stress')) {
+    return `🔬 <strong>The Science Behind Cat Therapy</strong><br><br>
+This isn't just whimsy — it's evidence-backed:<br><br>
+🔊 <strong>Purring heals:</strong> Cat purr frequencies (<em>${KB.science.purrFrequency} Hz</em>) promote bone density, reduce swelling, and lower blood pressure. These are the same frequencies used in therapeutic vibration devices.<br><br>
+😌 <strong>Oxytocin release:</strong> Even just <em>watching</em> animals (not just touching) triggers bonding hormones that counteract stress and social isolation.<br><br>
+💤 <strong>Sleep improves:</strong> A quiet cat session before bed reduces racing thoughts and improves sleep onset.<br><br>
+🎯 <strong>Focus returns:</strong> Micro-breaks with positive emotional stimuli restore cognitive attention better than scrolling social media.<br><br>
+📊 <strong>Key stats:</strong><br>
+<span class="tag">${KB.science.stressReduction}</span><br>
+<span class="tag">8 min to feel calmer</span><br>
+<span class="tag">25Hz = therapeutic vibration range</span>`;
+  }
+
+  // Find specific cat by name
+  const catNames = ['jeeves', 'cheto', 'yumi', 'sassy', 'olaf', 'pulpo', 'van gogh', 'murfie', 'gilbert', 'ginebra', 'eo', 'cendra', 'iris', 'rayas', 'osi', 'bagui', 'fede', 'max', 'apollo', 'boobie', 'sir fluffy', 'chino', 'albert', 'gino', 'seacat', 'athena', 'aries', 'luna', 'evangeline', 'goodwill', 'butter', 'gittel', 'bello', 'lanter', 'nami', 'tito', 'spanky', 'cinnamon', 'thomas', 'cloudy', 'smokey', 'logan', 'himler', 'ponpon', 'abu', 'miyu', 'pixel', 'critic', 'barnabey', 'yoko', 'ushy', 'keeva', 'aysha', 'maggie', 'frankie', 'cesare', 'lluna', 'sue', 'halloween', 'mitti', 'kosmosis', 'principle', 'que', 'honey', 'molly', 'garfield', 'kitty', 'kotaro', 'kojiro', 'ava', 'chewy', 'gordo', 'kevin'];
+  const humanNames = ['silvia', 'betinna', 'ayelén', 'john', 'maría', 'célia', 'montse', 'nevena', 'letizia', 'josefina', 'anastasia', 'lina', 'marco', 'sylvia', 'ashley', 'cristina', 'jasmin', 'deven', 'jasmine', 'laird', 'chasity', 'jayleana', 'saddie', 'mitch', 'stefen', 'arianne', 'princess', 'jd', 'dynne', 'aimee', 'lou', 'dina', 'cia', 'sekar', 'barbara', 'stephanie', 'finola', 'annie', 'lucy', 'sara', 'fátima', 'beatrice', 'ana', 'myrto', 'prana', 'karolina', 'gusté', 'nez', 'kammy', 'theresa', 'kirana', 'tracey', 'pepe-san', 'melissa', 'sharifa', 'sofía', 'fiorella'];
+  
+  const allSearchNames = [...catNames, ...humanNames];
+  for (const name of allSearchNames) {
+    if (q.includes(name)) {
+      const found = findCatByName(name);
+      if (found) {
+        return `🔍 <strong>Found!</strong><br><br>
+<div style="padding:0.8rem;background:rgba(0,245,255,0.07);border:1px solid rgba(0,245,255,0.25);border-radius:12px;">
+  🐱 <strong>Human host:</strong> ${found.human}<br>
+  😸 <strong>Cat(s):</strong> <em>${found.cats.join(', ')}</em><br>
+  📍 <strong>Location:</strong> ${found.location}<br>
+  🌍 <strong>Region:</strong> ${found.region}<br>
+  📸 <a href="${found.ig}" target="_blank">View on Instagram →</a>
+</div>
+<br><a href="${KB.platform.bookingForm}" target="_blank">📅 Book a session with this cat →</a>`;
+      }
+    }
+  }
+
+  // Instagram
+  if (q.includes('instagram') || q.includes('@') || q.includes('social media') || q.includes('ig')) {
+    return `📸 <strong>PawVibesZ on Instagram</strong><br><br>Follow <strong><a href="${KB.platform.instagram}" target="_blank">@pawvibesz</a></strong> on Instagram for cat videos, host intros, reels, and session highlights!<br><br>You can also find individual cat profiles by browsing the Instagram links for each host — ask me "cats in Spain" or any other country to get all the links! 😸`;
+  }
+
+  // Zoom
+  if (q.includes('zoom')) {
+    return `📹 <strong>Sessions are on Zoom</strong> — the same video platform you probably already have!<br><br>After booking and scheduling, you'll receive a Zoom link. Just click and join. The cat (and their human host) will be waiting.<br><br>The sessions are <em>unscripted and real</em> — no agenda, no presentations, just a living breathing purring cat doing cat things on screen. 😸<br><br><a href="${KB.platform.bookingForm}" target="_blank">📅 Schedule your Zoom cat session →</a>`;
+  }
+
+  // Loneliness / burnout / mental health
+  if (q.includes('lonely') || q.includes('stress') || q.includes('anxiet') || q.includes('burnout') || q.includes('mental health') || q.includes('depress') || q.includes('calm') || q.includes('relax')) {
+    return `💙 <strong>PawVibesZ was built for exactly this.</strong><br><br>We live in an era of constant noise — pinging phones, doom-scrolling, burnout culture. PawVibesZ offers something radically different: a few minutes of <em>genuine presence</em> with a real, living, purring creature.<br><br>🧠 <strong>Cortisol drops instantly</strong> — research shows stress hormones reduce within minutes<br>💙 <strong>Real connection</strong> in a world of AI avatars and fake warmth<br>🌿 <strong>Mindfulness without an app</strong> — watching a cat be a cat is a masterclass in presence<br>😴 <strong>Better sleep</strong> · 💓 Lower blood pressure · 😂 More laughter · 🧘 Less anxiety<br><br>A cat doesn't know what your deadlines are. It will just slow-blink at you and say: <em>"you're fine. breathe."</em><br><br><a href="${KB.platform.stripeSolo}" target="_blank">🐾 Book a €8 session now →</a>`;
+  }
+
+  // Testimonials / reviews
+  if (q.includes('review') || q.includes('testimonial') || q.includes('people say') || q.includes('what do people') || q.includes('customer')) {
+    const t = KB.testimonials;
+    return `💬 <strong>What People Say After Meeting Their Cat</strong><br><br>${t.map(x => `
+<div style="margin:0.4rem 0;padding:0.6rem 0.8rem;background:rgba(255,0,110,0.05);border-left:2px solid var(--neon-pink);border-radius:0 8px 8px 0;">
+  ⭐⭐⭐⭐⭐ <strong>${x.name}</strong> — ${x.location}<br>
+  <em style="font-style:italic;color:#ccc;">"${x.quote}"</em>
+</div>`).join('')}`;
+  }
+
+  // Total count of cats
+  if (q.includes('how many cat') || q.includes('total cat') || q.includes('list all')) {
+    const total = Object.values(KB.cats).reduce((s, a) => s + a.length, 0);
+    const totalCats = Object.values(KB.cats).reduce((s, a) => s + a.reduce((ss, e) => ss + e.cats.length, 0), 0);
+    return `📊 <strong>PawVibesZ by the numbers:</strong><br><br>
+👥 <strong>${total}</strong> human host specialists across all regions<br>
+🐱 <strong>${totalCats}+</strong> individual named cats (out of 70+ total)<br>
+🌍 <strong>13 regions</strong> covered<br>
+🌐 <strong>20+</strong> countries<br><br>
+Regions: Spain (15), US (10), Philippines (7), Europe (8), Germany (3), UK & Ireland (4), Indonesia (3), Africa (2), Portugal (1), Canada (1), East & SE Asia (3), Central America (2), and more!<br><br>
+Ask me "cats in Spain" or any other country for detailed listings! 😸`;
+  }
+
+  // Default / fallback
+  return `😸 <strong>Hmm, let me help you explore PawVibesZ!</strong><br><br>I have a full database of:<br>
+🐱 All <strong>70+ cats</strong> and their human hosts<br>
+📍 Every <strong>location</strong> (20+ countries)<br>
+📸 <strong>Instagram links</strong> for every cat profile<br>
+💰 <strong>Pricing</strong> and how to book<br>
+🔬 The <strong>science</strong> behind cat therapy<br>
+💬 <strong>Testimonials</strong> from real customers<br><br>
+Try asking: <em>"cats in Spain"</em>, <em>"find Jeeves"</em>, <em>"how much does it cost"</em>, <em>"tell me about the health benefits"</em>, or any cat or host name!<br><br>
+<a href="${KB.platform.website}" target="_blank">🐾 Or visit the official site →</a>`;
+}
+
+// ── Chat Engine ──
+const messagesEl = document.getElementById('messages');
+let msgCount = 0;
+
+function getTime() {
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function addMsg(content, role) {
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const isBot = role === 'bot';
+  div.innerHTML = `
+    <div class="msg-avatar ${isBot ? 'bot' : 'user-av'}">${isBot ? '🐾' : 'YOU'}</div>
+    <div>
+      <div class="msg-bubble">${content}</div>
+      <span class="msg-time">${getTime()}</span>
+    </div>`;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'msg bot'; div.id = 'typing';
+  div.innerHTML = `<div class="msg-avatar bot">🐾</div><div><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>`;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+function sendMsg() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+  addMsg(text, 'user');
+  input.value = '';
+  input.style.height = 'auto';
+  showTyping();
+  const delay = 600 + Math.random() * 800;
+  setTimeout(() => {
+    removeTyping();
+    addMsg(getResponse(text), 'bot');
+  }, delay);
+}
+
+function askQ(question) {
+  document.getElementById('userInput').value = question;
+  sendMsg();
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// ── Initial greeting ──
+setTimeout(() => {
+  addMsg(`😻 <strong>Meow! I'm PawBot</strong> — your AI guide to <em>PawVibesZ</em>, the world's first Cats on Zoom platform!<br><br>I know all about our <strong>70+ cats</strong> across <strong>20+ countries</strong> — their names, human hosts, locations, and Instagram profiles. I can help you book, answer science questions, or just find the perfect cat for your vibe.<br><br>What would you like to know? 🐾`, 'bot');
+}, 500);
+</script>
+</body>
+</html>
